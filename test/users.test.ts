@@ -64,3 +64,34 @@ describe("POST /api/auth/login validation test", () => {
     expect(response.status).toBe(422);
   });
 });
+
+describe("GET /api/auth/current authorization test", () => {
+  const app = new Elysia().use(usersRoute);
+
+  it("should return 401 Unauthorized if Authorization header is missing", async () => {
+    const response = await app.handle(
+      new Request("http://localhost/api/auth/current", {
+        method: "GET",
+      })
+    );
+
+    expect(response.status).toBe(401);
+    const body = await response.json();
+    expect(body).toEqual({ error: "Unauthorized" });
+  });
+
+  it("should return 401 Unauthorized if token format is invalid", async () => {
+    const response = await app.handle(
+      new Request("http://localhost/api/auth/current", {
+        method: "GET",
+        headers: {
+          Authorization: "Basic invalidtoken",
+        },
+      })
+    );
+
+    expect(response.status).toBe(401);
+    const body = await response.json();
+    expect(body).toEqual({ error: "Unauthorized" });
+  });
+});
