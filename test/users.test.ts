@@ -33,3 +33,34 @@ describe("POST /api/auth/register validation test", () => {
     expect(response.status).toBe(422);
   });
 });
+
+describe("POST /api/auth/login validation test", () => {
+  const app = new Elysia().use(usersRoute);
+
+  it("should fail validation if payload is empty", async () => {
+    const response = await app.handle(
+      new Request("http://localhost/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      })
+    );
+
+    expect(response.status).toBe(422);
+  });
+
+  it("should fail validation if email is invalid", async () => {
+    const response = await app.handle(
+      new Request("http://localhost/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: "not-an-email",
+          password: "somepassword",
+        }),
+      })
+    );
+
+    expect(response.status).toBe(422);
+  });
+});
